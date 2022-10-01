@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+ 	http://www.springframework.org/schema/beans/spring-beans.xsd
+ 	 http://www.springframework.org/schema/context 
+ 	http://www.springframework.org/schema/context/spring-context.xsd">
+	<!-- 0加载properties文件 -->
+	<context:property-placeholder location="classpath:c3p0-db.properties" />
+	<!-- 1 配置数据源，读取properties文件信息 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${jdbc.driverClass}"></property>
+		<property name="jdbcUrl" value="${jdbc.jdbcUrl}"></property>
+		<property name="user" value="${jdbc.user}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+	</bean>
+	<!-- 2 配置jdbc模板 -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!-- 3 配置dao -->
+	<bean id="accountDao" class="cn.itcast.dao.impl.AccountDaoImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+	<!-- 4 配置service -->
+	<bean id="accountService" class="cn.itcast.service.impl.AccountServiceImpl">
+		<property name="accountDao" ref="accountDao"></property>
+	</bean>
+	<!-- #1 事务管理器，依赖于数据源 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!-- #2 生成代理类，让代理管理事务，依赖于事务管理器 -->
+	<bean id="accountServiceProxy"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<!-- #2.1 提供事务管理器 -->
+		<property name="transactionManager" ref="transactionManager"></property>
+		<!-- #2.2 目标类 -->
+		<property name="target" ref="accountService"></property>
+		<!-- #2.3 提供接口 -->
+		<property name="proxyInterfaces" value="cn.itcast.service.AccountService"></property>
+		<!-- #2.4 事务的详情配置，给 TransactionDefinition进行赋值 -->
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRED,ISOLATION_REPEATABLE_READ</prop>
+			</props>
+		</property>
+	</bean>
+</beans>
