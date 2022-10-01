@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 	<!DOCTYPE struts PUBLIC
+ 	    "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+ 	    "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+	<!-- 开发模式 -->
+	<constant name="struts.devMode" value="true"></constant>
+	<!-- 开发模式 -->
+	<constant name="struts.devMode" value="true"></constant>
+	<package name="ssh" namespace="/" extends="struts-default">
+<!-- 	action的创建交予Sping -->
+		<!-- <action name="userAction_*" class="userAction" method="{1}"> -->
+		<!-- <result name="add">/success.jsp</result> -->
+		<!-- </action> -->
+<!-- 	使用Struts2自身创建Action	 -->
+		<action name="userAction_*" class="cn.itcast.action.UserAction"
+			method="{1}">
+			<result name="add">/success.jsp</result>
+		</action>
+
+	</package>
+
+</struts>
